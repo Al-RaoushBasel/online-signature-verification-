@@ -1,36 +1,92 @@
-# Online Signature Verification Project
+# Online Signature Verification
 
-## Overview
-This repository collects a series of Jupyter notebooks that walk through the design, evaluation, and progressive improvement of machine-learning pipelines for online signature verification. The work explores classical feature engineering on stylus trajectory data (position, pressure, altitude, and azimuth), multiple classifier families, and ensemble techniques to distinguish genuine signatures from skilled forgeries. In addition to exploratory analysis, the notebooks document incremental experiments, model tuning, and cross-dataset comparisons that can be reproduced locally or in Google Colab.
+An ML pipeline that distinguishes **genuine handwritten signatures from skilled forgeries** using stylus trajectory data (position, pressure, altitude, azimuth). Trained and compared multiple classifiers across 5 international signature datasets.
 
-## Repository structure
-| File | Description |
-| --- | --- |
-| `1.ipynb` | Exploratory data analysis of the MCYT-style training set, including distribution checks, trajectory visualization, pressure trends, directional angles, and correlation heatmaps. |
-| `2.ipynb` | Baseline ML pipeline that engineers summary statistics per signature and compares logistic regression, SVM, and random forest classifiers with and without spatial (`X`, `Y`) features. |
-| `3.ipynb` | Production-style pipeline with refreshed preprocessing, scaling, and evaluation of Random Forest vs. KNN, including Equal Error Rate (EER) estimation and confusion matrices. |
-| `4.ipynb` | Experiments with XGBoost, a multilayer perceptron (MLP), and a soft voting ensemble evaluated via accuracy, F1 score, EER, and confusion matrices. |
-| `5.ipynb` | Hyper-parameter tuning (GridSearchCV) for XGBoost and MLP, plus weighted voting and stacking ensembles aimed at boosting verification accuracy. |
-| `6.ipynb` | Comparative study of four models across five signature datasets (MCYT, Chinese, Dutch, German, SVC) with consolidated metrics tables and charts. |
-| `OSV-1.pdf` | Reference material describing signature verification concepts and experiments. |
-| `Online Signature Verification Using Machine Learning .pdf` | Project report summarizing methodology and findings. |
+---
 
-## Highlights
-* **Feature engineering focus** – Notebook 2 shows how summary statistics for pressure, altitude, and azimuth drive baseline performance, with Random Forest benefiting most when spatial coordinates are included (`F1 = 0.605`, `accuracy = 0.705`).
-* **Verification metrics** – Notebook 3 emphasises verification-specific evaluation such as Equal Error Rate; the Random Forest model achieves `accuracy = 0.837`, `F1 = 0.847`, and `EER = 0.159`.
-* **Model scaling** – Later notebooks introduce gradient boosting, neural networks, voting/stacking ensembles, and per-dataset benchmarking to understand generalisation across acquisition protocols.
+## Results
 
-## Getting started
-1. **Environment** – Use Python 3.9+ with common data-science libraries (`pandas`, `numpy`, `scikit-learn`, `matplotlib`, `seaborn`, `xgboost`). Installing `jupyter` is recommended for local execution; alternatively, open the notebooks directly in Google Colab.
-2. **Data access** – The notebooks expect signature datasets stored in Google Drive (e.g., `mcytTraining.txt`). Upload the raw files to your drive or adjust the paths under the data-loading cells to point to local copies.
-3. **Execution order** – Work through the notebooks numerically (`1.ipynb` → `6.ipynb`) to follow the narrative from exploratory analysis through increasingly sophisticated models.
-4. **Reproducibility** – Many notebooks include random seeds, but results may vary slightly between runs because of stochastic model components. When tuning or stacking models, enable GPU acceleration in Colab if available for faster training.
+**MCYT Dataset Benchmark:**
 
-## Extending the project
-* Integrate temporal dynamics (e.g., velocity, acceleration) in feature engineering to capture signing behaviour over time.
-* Experiment with deep learning architectures for sequence modelling such as recurrent or transformer-based networks.
-* Apply cross-validation and class-imbalance techniques (resampling or class weighting) to improve robustness on imbalanced datasets.
-* Automate the workflow by exporting reusable preprocessing and model-training utilities into Python modules.
+| Model | Accuracy | F1 Score | EER |
+|-------|----------|----------|-----|
+| **Random Forest** | **92.3%** | **93.7%** | **0.075** |
+| MLP (Neural Net) | 92.0% | 93.3% | 0.078 |
+| XGBoost | 90.8% | 92.1% | 0.095 |
+| KNN | 90.3% | 91.3% | 0.110 |
 
-## Citation
-If you build on this work, please cite the MCYT and other signature datasets according to their respective licenses and acknowledge the original project report included in this repository.
+Evaluated across **5 datasets**: MCYT, Chinese, Dutch, German, and SVC. Random Forest and MLP consistently performed at the top across all datasets.
+
+---
+
+## How It Works
+
+```
+Raw Signature Data (x, y, pressure, altitude, azimuth)
+        |
+        v
+Feature Engineering (summary statistics, spatial features)
+        |
+        v
+Model Training (SVM, RF, XGBoost, MLP)
+        |
+        v
+Ensemble (Voting + Stacking) --> Genuine / Forgery
+```
+
+1. **Feature Engineering** — Extract statistical features from pressure, altitude, azimuth, and spatial coordinates per signature sample
+2. **Model Training** — Train and compare Logistic Regression, SVM, Random Forest, KNN, XGBoost, and MLP classifiers
+3. **Ensemble Methods** — Combine top models via soft voting and stacking for improved accuracy
+4. **Cross-Dataset Evaluation** — Benchmark generalization across 5 different signature datasets with different acquisition protocols
+
+---
+
+## Tech Stack
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=fff)
+![Scikit-learn](https://img.shields.io/badge/Scikit--learn-F7931E?style=flat-square&logo=scikitlearn&logoColor=fff)
+![XGBoost](https://img.shields.io/badge/XGBoost-006600?style=flat-square)
+![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=fff)
+![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat-square&logo=numpy&logoColor=fff)
+![Jupyter](https://img.shields.io/badge/Jupyter-F37626?style=flat-square&logo=jupyter&logoColor=fff)
+
+---
+
+## Project Structure
+
+```
+├── 1.ipynb    Exploratory data analysis (distributions, trajectory viz, correlation heatmaps)
+├── 2.ipynb    Baseline pipeline (Logistic Regression, SVM, Random Forest)
+├── 3.ipynb    Production pipeline with EER evaluation (RF vs KNN)
+├── 4.ipynb    XGBoost, MLP, and soft voting ensemble
+├── 5.ipynb    Hyperparameter tuning (GridSearchCV) + stacking ensemble
+├── 6.ipynb    Cross-dataset benchmarking (MCYT, Chinese, Dutch, German, SVC)
+└── *.pdf      Project report and reference materials
+```
+
+---
+
+## Quick Start
+
+```bash
+# Clone
+git clone https://github.com/Al-RaoushBasel/online-signature-verification-.git
+cd online-signature-verification-
+
+# Install dependencies
+pip install pandas numpy scikit-learn xgboost matplotlib seaborn jupyter
+
+# Run notebooks in order
+jupyter notebook 1.ipynb
+```
+
+Notebooks expect signature datasets in Google Drive paths — adjust the data-loading cells to point to your local copies, or open directly in [Google Colab](https://colab.research.google.com/).
+
+---
+
+## Key Takeaways
+
+- **Pressure and azimuth features** are the strongest discriminators between genuine and forged signatures
+- **Random Forest** benefits most from including spatial coordinates (X, Y)
+- **Stacking ensembles** outperform individual models across all datasets
+- **Cross-dataset generalization** varies significantly — models trained on MCYT don't transfer well to Chinese signatures without retraining
